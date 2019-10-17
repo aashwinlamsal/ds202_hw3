@@ -70,4 +70,20 @@ ggplot(timesWithNoDelay, aes(hour, group = time_hour)) + geom_histogram() + labs
 ```
 After the conditional statment used filtered the dataframe by about half of its original size. Sorting the dataframe by hour showed that most of the flight times where delays were avoided took place between 5 and 10 AM. There were times that had avoidable delays later on in the day. but they weren't as frequent (judging infrequency by time_hour to see the dates of the flights) as the early morning flights.
 
+4) There are 4 other relational datasets in the nycflights13 package,
+airlines gives information on the abbreviated airport codes,
+airports gives info on each airport, identified by the faa airport code,
+planes gives info on each plane, identified by its tailnum,
+weather gives info on each NYC airport for each hour.
 
+Loading the datasets...
+```{r}
+data(airlines,package='nycflights13')
+data(airports,package='nycflights13')
+data(planes,package='nycflights13')
+data(weather,package='nycflights13')
+
+```
+After viewing the diagram, write out how the dataset flights connects to these 4 other datasets (there may be more than one variable that connects them). I’ll do the first one for you:
+
+- flights connects to planes through a single variable, tailnum.
