@@ -41,7 +41,8 @@ arriveLateLeaveOnTime <- filter(flights, arr_delay>120 & dep_delay<=0)
 head(arriveLateLeaveOnTime,10)
 
 #flights that were delayed by AT LEAST an hour, but made up OVER 30 minutes in flight
-makeUp30 <- filter(flights, dep_delay >= 60 & (arr_time-sched_arr_time < -30))
+makeUp30 <- filter(flights, dep_delay >= 60 & (dep_delay - arr_delay > 30)) # if departure delay is 10 minutes late, we expect arrival delay to be 10 minutes late as well
+#but if arrival delay is -20 minutes, that means the flight caught up by 30 minutes in the air (10- (-20) = 30)
 head(makeUp30, 10)
 
 
