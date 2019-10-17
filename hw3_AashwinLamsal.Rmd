@@ -19,5 +19,31 @@ This data frame contains all 336,776 flights that departed from New York City in
 -Arrived more than two hours late, but didn’t leave late
 -Were delayed by at least an hour, but made up over 30 minutes in flight
 
+```{r}
+library(tidyverse)
+data(flights,package="nycflights13")
+head(flights)
 
+#flights that had an arrival delay of two or more hours
+arrDelay2Hours <- filter(flights, arr_delay>=120)#since delay times are given in minutes
+head(arrDelay2Hours, 10)
+
+#flights that flew to Houston airports: IAH or HOU
+houstonFlights <- filter(flights, dest == "IAH"|dest == "HOU")
+head(houstonFlights, 10)
+
+#flights that departed in the summer monthts: July, August, or September
+summerFlights <- filter(flights, month == 7 | month == 8 | month == 9)
+head(summerFlights, 10)
+
+#flights that arrived more than 2 hours late, but did NOT leave late
+arriveLateLeaveOnTime <- filter(flights, arr_delay>120 & dep_delay<=0)
+head(arriveLateLeaveOnTime,10)
+
+#flights that were delayed by AT LEAST an hour, but made up OVER 30 minutes in flight
+makeUp30 <- filter(flights, dep_delay >= 60 & (arr_time-sched_arr_time < -30))
+head(makeUp30, 10)
+
+
+```
 
