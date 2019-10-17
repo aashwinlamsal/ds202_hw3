@@ -1,0 +1,23 @@
+---
+title: "hw3_AashwinLamsal"
+author: "Aashwin Lamsal"
+date: "10/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 3: NYC Flights Data
+This data frame contains all 336,776 flights that departed from New York City in 2013. The data comes from the US Bureau of Transportation Statistics, and is documented in ?flights.
+
+1) Find all flights that:
+-Had an arrival delay of two or more hours
+-Flew to Houston (IAH or HOU)
+-Departed in summer (July, August, and September)
+-Arrived more than two hours late, but didn’t leave late
+-Were delayed by at least an hour, but made up over 30 minutes in flight
+
+
+
