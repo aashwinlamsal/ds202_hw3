@@ -68,6 +68,10 @@ ggplot(timesWithNoDelay, aes(hour, group = time_hour)) + geom_histogram() + labs
 
 
 ```
+
+
+
+
 After the conditional statment used filtered the dataframe by about half of its original size. Sorting the dataframe by hour showed that most of the flight times where delays were avoided took place between 5 and 10 AM. There were times that had avoidable delays later on in the day. but they weren't as frequent (judging infrequency by time_hour to see the dates of the flights) as the early morning flights.
 
 4) There are 4 other relational datasets in the nycflights13 package,
@@ -131,4 +135,99 @@ ggplot(weatherDelays, aes(wind_speed)) + geom_histogram(bins=20) + labs(x = "Win
 ```
 
 Based on what was seen in the distributions above, the weather conditions that affect weather delays the most seem to be visibility, precipitation, and wind speed. Visibility must be around 10 miles, otherwise the plane will not take off. It's a similar situation for precipitation, as most flights will not take off if there is any storms/rainfall happening at the airport. Wind speed however is slightly different, mainly because most flights take off when the wind is between 10 and 15 miles per hour. Flights will continue to take off with winds upwards of 25 miles per hour, though the number of flights do dwindle, and after winds reach speeds of 30 miles per hour, there are no planes taking off.
+
+7) If we had used left_join in the previous problem, would that change our results? Investigate. Does using an inner_join or left_join make more sense here?
+```{r}
+library(ggplot2)
+library(tidyverse)
+data(airlines,package='nycflights13')
+data(airports,package='nycflights13')
+data(planes,package='nycflights13')
+data(weather,package='nycflights13')
+
+
+flightLeft = flights %>%
+left_join(weather, by = c(
+  "origin" = "origin",
+  "year" = "year",
+  "month" = "month",
+  "day" = "day",
+  "hour" = "hour"
+ ))
+
+head(flightLeft)
+
+weatherLeftDelays <- filter(flightLeft, (dep_delay > 60 | arr_delay > 60))
+
+head(weatherLeftDelays)
+
+ggplot(weatherLeftDelays, aes(precip)) + geom_histogram(bins=20) + labs(x = "Precipitation (in)", y="No. of Flights", title = "Distribution of Flights by Amount of Precipitation") #distribution of the number of flights versus precipitation amounts
+
+ggplot(weatherLeftDelays, aes(visib)) + geom_histogram(bins=20) + labs(x = "Visibility (mi)", y="No. of Flights", title = "Distribution of Flights by Visible Distance") #distribution of the number of flights versus visiblity
+
+ggplot(weatherLeftDelays, aes(wind_speed)) + geom_histogram(bins=20) + labs(x = "Wind Speed (mph)", y="No. of Flights", title = "Distribution of Flights by Wind Speed") #distribution of the number of flights versus precipitation amounts
+
+
+
+```
+
+
+In a left-join, all data in the left table (in our case, this would be flights) are kept, with nonmatches between the flights and weather tables being filled in by NA values. However, it seems that it doesn't matter whether we use an inner-join or a left-join, since both combined tables share all of the same attributes/variables. As far as which join makes more sense goes, inner-joins only keep matches between both tables, while all outer-joins, including left-joins, will keep all data in one of the two tables, so I think that when combining tables, you would want to look for matches between the two tables, so I would recommend inner-join over left-join.
+
+8) Is there a relationship between the age of a plane and its departure delays? Information on age of a plane can be found in planes under variable year. Information on departure delays can be found in flights under variable dep_delay.
+
+```{r}
+planes <- mutate(planes, "age" = 2019 - year)
+
+flightsPlanesJoin <-
+  planes %>%
+  inner_join(flights, by = c("tailnum" = "tailnum"))
+
+head(flightsPlanesJoin)
+ggplot(flightsPlanesJoin, aes(x = age, y = dep_delay)) + geom_point() + labs(x="Plane Age (yrs)", y = "Departure Delay (min)", title = "Delays versus Plane Age")
+
+```
+Judging from the scatter plot made above, there seems to be no correlation between the age of the plane and the length of a delay, in fact older planes seem to have shorter delays than planes age 0-25.
+
+9) What does anti_join(flights, airports, by = c("dest" = "faa")) tell you? What does anti_join(airports, flights, by = c("faa" = "dest")) tell you?
+
+  -Anti-joins between two tables are primarily used to look for join mismatches, since anti_join(x,y) drops all observations in x that have a match in y.
+
+```{r}
+flightsAirports <- inner_join(flights, airports, by = c("dest"="faa"))
+flightsAnti <- anti_join(flights, airports, by = c("dest" = "faa"))
+head(flightsAirports)
+head(flightsAnti)
+head(flights)
+
+```
+Anti-joining between flights and airports didn't drop any values from the flight table at all, which tells me that airports and flights don't have any corresponding matching values that can be dropped in the first place, aside from dest and faa since their its the primary key between the two tables.
+
+```{r}
+flightsAirports2 <- inner_join(airports, flights, by = c("faa"="dest"))
+flightsAnti2 <- anti_join(airports, flights, by = c("faa" = "dest"))
+
+head(flightsAirports2)
+head(flightsAnti2)
+head(flights)
+
+```
+Anti-joining between airports and flights, this time switching the order of the join so we also have to switch the order of the column names that correspond to the correct tables, shows me only columns found in the airports table. This further shows that airports and flights don't have any other corresponding columns/values, aside from the primary key that they share (faa and dest)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
