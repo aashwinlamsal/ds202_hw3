@@ -64,7 +64,7 @@ zeroDelays <- filter(flights, (dep_delay <= 0 & arr_delay <= 0))
 timesWithNoDelay <- select(zeroDelays,hour, minute, time_hour, dep_delay)
 head(timesWithNoDelay, 15)
 
-ggplot(timesWithNoDelay, aes(hour, group = time_hour)) + geom_histogram() + labs(x = "Hours", y = "Frequency of Flights", title = "Distribution of Times for Flights With No Delays")
+ggplot(timesWithNoDelay, aes(hour, group = time_hour)) + geom_histogram() + labs(x = "Hour of Day", y = "Frequency of Flights", title = "Distribution of Times for Flights With No Delays")
 
 
 ```
@@ -87,3 +87,48 @@ data(weather,package='nycflights13')
 After viewing the diagram, write out how the dataset flights connects to these 4 other datasets (there may be more than one variable that connects them). I’ll do the first one for you:
 
 - flights connects to planes through a single variable, tailnum.
+Your turn:
+- flights connects to airlines through a single variable, carrier.
+- flights connects to airports through two variables, origin and dest.
+- flights connects to weather through five variables, year, month, day, hour, and origin.
+
+5) The relationship between weather and airports is the single variable origin that they share. On the diagram, an arrow should connect origin in the weather table to faa/origin in the airports table.
+
+6) The following code joins data frames flights and weather together. Based on flight_weather, what weather conditions make it more likely to see a delay?
+```{r}
+library(ggplot2)
+library(tidyverse)
+data(airlines,package='nycflights13')
+data(airports,package='nycflights13')
+data(planes,package='nycflights13')
+data(weather,package='nycflights13')
+
+
+flight_weather = flights %>%
+inner_join(weather, by = c(
+  "origin" = "origin",
+  "year" = "year",
+  "month" = "month",
+  "day" = "day",
+  "hour" = "hour"
+ ))
+
+head(flight_weather)
+
+weatherDelays <- filter(flight_weather, (dep_delay > 60 | arr_delay > 60))
+
+head(weatherDelays)
+
+ggplot(weatherDelays, aes(precip)) + geom_histogram(bins=20) + labs(x = "Precipitation (in)", y="No. of Flights", title = "Distribution of Flights by Amount of Precipitation") #distribution of the number of flights versus precipitation amounts
+
+ggplot(weatherDelays, aes(visib)) + geom_histogram(bins=20) + labs(x = "Visibility (mi)", y="No. of Flights", title = "Distribution of Flights by Visible Distance") #distribution of the number of flights versus visiblity
+
+ggplot(weatherDelays, aes(wind_speed)) + geom_histogram(bins=20) + labs(x = "Wind Speed (mph)", y="No. of Flights", title = "Distribution of Flights by Wind Speed") #distribution of the number of flights versus precipitation amounts
+
+
+
+
+```
+
+Based on what was seen in the distributions above, the weather conditions that affect weather delays the most seem to be visibility, precipitation, and wind speed. Visibility must be around 10 miles, otherwise the plane will not take off. It's a similar situation for precipitation, as most flights will not take off if there is any storms/rainfall happening at the airport. Wind speed however is slightly different, mainly because most flights take off when the wind is between 10 and 15 miles per hour. Flights will continue to take off with winds upwards of 25 miles per hour, though the number of flights do dwindle, and after winds reach speeds of 30 miles per hour, there are no planes taking off.
+
