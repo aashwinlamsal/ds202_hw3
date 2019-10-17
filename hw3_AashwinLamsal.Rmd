@@ -44,7 +44,30 @@ head(arriveLateLeaveOnTime,10)
 makeUp30 <- filter(flights, dep_delay >= 60 & (dep_delay - arr_delay > 30)) # if departure delay is 10 minutes late, we expect arrival delay to be 10 minutes late as well
 #but if arrival delay is -20 minutes, that means the flight caught up by 30 minutes in the air (10- (-20) = 30)
 head(makeUp30, 10)
+```
+2) From lecture, our definition of cancelled flights (is.na(dep_delay) | is.na(arr_delay) ). This is not optimal. Why? Explain which is the most important column.
+    -  The current definition of cancelled flights is not optimal because if there is
+       an instance of NA values showing up in dep_delay, then there isn't a feasible 
+       way for their to be a non-NA value in arr_delay, so having the conditional
+       statement isn't optimal. This is why the dep_delay column is the most 
+       important column between the two, since the dep_delay affects the arr_delay 
+       column the most, ideally the arr_delay should be equally delayed as the 
+       dep_delay (if your flight was delayed by 10 minutes, you would expect to arrive 10 minutes late).
+       
+       
+3) What time of day should you fly if you want to avoid delays as much as possible?
+```{r}
+library(tidyverse)
+library(ggplot2)
+data(flights,package="nycflights13")
+zeroDelays <- filter(flights, (dep_delay <= 0 & arr_delay <= 0))
+timesWithNoDelay <- select(zeroDelays,hour, minute, time_hour, dep_delay)
+head(timesWithNoDelay, 15)
+
+ggplot(timesWithNoDelay, aes(hour, group = time_hour)) + geom_histogram() + labs(x = "Hours", y = "Frequency of Flights", title = "Distribution of Times for Flights With No Delays")
 
 
 ```
+After the conditional statment used filtered the dataframe by about half of its original size. Sorting the dataframe by hour showed that most of the flight times where delays were avoided took place between 5 and 10 AM. There were times that had avoidable delays later on in the day. but they weren't as frequent (judging infrequency by time_hour to see the dates of the flights) as the early morning flights.
+
 
